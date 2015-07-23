@@ -54,6 +54,7 @@ public class KolodaView: UIView, KolodaCardViewProtocol {
         
         set {
             _enabled = newValue
+            userInteractionEnabled = _enabled
         }
     }
     public var animatedAppearing = true
@@ -83,9 +84,7 @@ public class KolodaView: UIView, KolodaCardViewProtocol {
         super.layoutSubviews()
         
         if !configured {
-            
-            backgroundColor = UIColor.yellowColor()
-            
+                        
             if visibleCards.isEmpty {
                 reloadData()
             }
@@ -184,6 +183,7 @@ public class KolodaView: UIView, KolodaCardViewProtocol {
         let card = recycler.dequeue(identifier: KolodaView.KolodaCardViewKey) as! KolodaCardView
         card.delegate = self
         card.configure(contentView, overlay: overlayView)
+        card.number = index
         
         return card
     }
@@ -328,6 +328,7 @@ public class KolodaView: UIView, KolodaCardViewProtocol {
     }
     
     func cardReleased(card: KolodaCardView) {
+        enabled = false
         interactionDelegate?.koloda(self, interactionEndedWithCardAtIndex: currentCardNumber)
         
         if 1 < visibleCards.count {
@@ -336,10 +337,12 @@ public class KolodaView: UIView, KolodaCardViewProtocol {
             }, completion: { _ in
                 self.resetVisibleCardsTransparency()
                 self.animating = false
+                self.enabled = true
             })
         }
         else {
             animating = false
+            enabled = true
         }
     }
     
@@ -354,6 +357,7 @@ public class KolodaView: UIView, KolodaCardViewProtocol {
     }
     
     func card(card: KolodaCardView, swipedInDirection direction: KolodaDirection) {
+        enabled = false
         interactionDelegate?.koloda(self, interactionEndedWithCardAtIndex: currentCardNumber)
         
         recycle(card: card)
@@ -393,6 +397,7 @@ public class KolodaView: UIView, KolodaCardViewProtocol {
                 animation.completionBlock = { (_, _) in
                     self.visibleCards.last?.hidden = false
                     self.animating = false
+                    self.enabled = true
                     self.delegate?.koloda(self, didSwipedCardAtIndex: self.currentCardNumber - 1, inDirection: direction)
                 }
                 card.alpha = visualSettings.alphaValueOpaque
@@ -408,6 +413,7 @@ public class KolodaView: UIView, KolodaCardViewProtocol {
     
     private func didSwipeLastCard(direction: KolodaDirection) {
         animating = false
+        enabled = true
 
         delegate?.koloda(self, didSwipedCardAtIndex: currentCardNumber - 1, inDirection: direction)
         delegate?.kolodaDidRunOutOfCards(self)

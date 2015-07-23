@@ -35,6 +35,7 @@ public class KolodaCardView: KolodaBaseView {
     public internal(set) var contentView: KolodaContentView?
     public internal(set) var overlayView: KolodaOverlayView?
     
+    internal var number: Int!
     private var margin: CGFloat!
     private var distance: CGPoint!
     private var originalCenter: CGPoint!
@@ -47,7 +48,7 @@ public class KolodaCardView: KolodaBaseView {
         }
     }
     
-    override public init(frame: CGRect) {
+    required public init(frame: CGRect) {
         super.init(frame: frame)
         
         setupCard()
@@ -115,6 +116,7 @@ public class KolodaCardView: KolodaBaseView {
     // MARK: - Private
     
     private func setDefaultValues() {
+        number = -1
         margin = 0.0
         distance = CGPointMake(0.0, 0.0)
         originalCenter = CGPointMake(0.0, 0.0)
@@ -129,8 +131,7 @@ public class KolodaCardView: KolodaBaseView {
     }
     
     private func setupCard() {
-        self.identifier = "KolodaCardView"
-        self.backgroundColor = UIColor.blackColor()
+        identifier = "KolodaCardView"
         
         setDefaultValues()
         addGestures()
@@ -166,8 +167,6 @@ public class KolodaCardView: KolodaBaseView {
     func panGestureHandler(recognizer: UIPanGestureRecognizer) {
         let location = recognizer.locationInView(self)
         distance = recognizer.translationInView(self)
-        
-        //NSLog("Location: \(location.x), \(location.y) | Distance: \(distance.x), \(distance.y))")
         
         switch recognizer.state {
         case .Began:
@@ -220,7 +219,7 @@ public class KolodaCardView: KolodaBaseView {
         } else {
             direction = .None
         }
-                
+        
         delegate?.card(self, draggedWithPercent: percent, inDirection: direction)
     }
     
@@ -275,7 +274,7 @@ public class KolodaCardView: KolodaBaseView {
         let valueY = originalCenter.y + distance.y
         let valueX = direction == .Left ? -screenWidth : 2 * screenWidth
         let destination = CGPointMake(valueX, valueY)
-        
+                
         animate(direction: direction) { _ in
             self.center = destination
         }

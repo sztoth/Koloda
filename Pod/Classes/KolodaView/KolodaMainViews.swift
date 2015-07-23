@@ -10,6 +10,14 @@ import UIKit
 
 public class KolodaBaseView: UIView, KolodaReusableProtocol {
     
+    required override public init(frame: CGRect) {
+        super.init(frame: frame)
+    }
+    
+    required public init(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+    }
+    
     private func setup(#identifier: String) {
         self.identifier = identifier
     }
@@ -26,7 +34,7 @@ public class KolodaContentView: KolodaBaseView {
 
     // MARK: Internal initialization stuffs
 
-    override public init(frame: CGRect) {
+    required public init(frame: CGRect) {
         super.init(frame: frame)
         
         setup(identifier: "KolodaContentView")
@@ -61,7 +69,7 @@ public class KolodaOverlayView: KolodaBaseView {
 
     // MARK: Internal initialization stuffs
     
-    override public init(frame: CGRect) {
+    required public init(frame: CGRect) {
         super.init(frame: frame)
         
         setup(identifier: "KolodaOverlayView")

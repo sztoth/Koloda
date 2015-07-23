@@ -50,7 +50,7 @@ internal class KolodaRecycler: NSObject {
         
         if let index = registeredClasses.indexForKey(identifier) {
             let objectClass = registeredClasses[index].1
-            let item = objectClass()
+            let item = objectClass(frame: CGRectZero)
             item.prepareForReuse()
             return item
         }

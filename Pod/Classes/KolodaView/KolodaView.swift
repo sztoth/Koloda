@@ -98,8 +98,16 @@ public class KolodaView: UIView, KolodaCardViewProtocol {
     
     // MARK: - Recycling views
     
-    public func dequeueReusableView(#identifier: String) -> KolodaBaseView? {
-        return recycler.dequeue(identifier: identifier)
+    public func dequeueReusableView<T: KolodaBaseView>(#identifier: String) -> T {
+        let view: T? = recycler.dequeue(identifier: identifier)
+        if let validView = view {
+            validView.prepareForReuse()
+        }
+        else {
+            NSException(name:"Error", reason:"Could not initiate view for the \"\(identifier)\" identifier.", userInfo:nil).raise()
+        }
+        
+        return view!
     }
     
     public func register(#nib: UINib, forObjectReuseIdentifier identifier: String) {
@@ -147,6 +155,10 @@ public class KolodaView: UIView, KolodaCardViewProtocol {
         for (index, card) in enumerate(self.visibleCards) {
             card.frame = frameForCardAtIndex(index)
         }
+    }
+    
+    public func forceLayoutCards() {
+        layoutCards()
     }
     
     private func frameForCardAtIndex(index: Int) -> CGRect {

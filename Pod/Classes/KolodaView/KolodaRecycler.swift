@@ -11,6 +11,7 @@ import UIKit
 public protocol KolodaReusableProtocol {
     var identifier: String { get set }
     func prepareForReuse()
+    func setupAfterAwake()
 }
 
 internal class KolodaRecycler: NSObject {
@@ -39,27 +40,25 @@ internal class KolodaRecycler: NSObject {
         unusedItems.insert(object)
     }
     
-    internal func dequeue(#identifier: String) -> KolodaBaseView {
+    internal func dequeue<T: KolodaBaseView>(#identifier: String) -> T? {
         let unusedItem = filter(unusedItems) { $0.identifier == identifier }.last
         
         if let item = unusedItem {
             unusedItems.remove(item)
             item.prepareForReuse()
-            return item
+            return item as? T
         }
         
         if let index = registeredClasses.indexForKey(identifier) {
             let objectClass = registeredClasses[index].1
             let item = objectClass(frame: CGRectZero)
-            item.prepareForReuse()
-            return item
+            return item as? T
         }
         
         if let index = registeredNibs.indexForKey(identifier) {
             let nib = registeredNibs[identifier]
-            let array = nib!.instantiateWithOwner(nil, options: nil)
-            let item = array[0] as! KolodaBaseView
-            item.prepareForReuse()
+            let item = nib!.instantiateWithOwner(nil, options: nil)[0] as? T
+            item?.setupAfterAwake()
             return item
         }
         

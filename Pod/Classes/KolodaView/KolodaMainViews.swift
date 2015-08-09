@@ -20,12 +20,14 @@ public class KolodaBaseView: UIView, KolodaReusableProtocol {
     
     private func setup(#identifier: String) {
         self.identifier = identifier
+        backgroundColor = UIColor.clearColor()
     }
     
     // MARK: KolodaReusableProtocol
     
     public var identifier = "KolodaBaseView"
     public func prepareForReuse() {}
+    public func setupAfterAwake() {}
 }
 
 // MARK: -

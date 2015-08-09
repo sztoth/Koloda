@@ -132,6 +132,7 @@ public class KolodaCardView: KolodaBaseView {
     
     private func setupCard() {
         identifier = "KolodaCardView"
+        layer.cornerRadius = 2.0
         
         setDefaultValues()
         addGestures()

@@ -21,7 +21,7 @@ public protocol KolodaVisualSettingsProtocol {
 
 public struct KolodaVisualSettings: KolodaVisualSettingsProtocol {
     public let backgroundCardFrameAnimationDuration = NSTimeInterval(0.2)
-    public let backgroundCardsTopMargin = CGFloat(4.0)
+    public let backgroundCardsTopMargin = CGFloat(12.0)
     public let backgroundCardsLeftMargin = CGFloat(8.0)
     public let backgroundCardsScalePercent = CGFloat(0.95)
     

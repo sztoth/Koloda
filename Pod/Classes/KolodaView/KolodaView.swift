@@ -133,7 +133,6 @@ public class KolodaView: UIView, KolodaCardViewProtocol {
                 
                 let cardView = createCard(index: index)
                 cardView.frame = frameForCardAtIndex(index)
-                cardView.alpha = isVisible(index: index) ? visualSettings.alphaValueOpaque : visualSettings.alphaValueSemiTransparent
                 cardView.userInteractionEnabled = isVisible(index: index)
                 
                 visibleCards.append(cardView)
@@ -179,13 +178,6 @@ public class KolodaView: UIView, KolodaCardViewProtocol {
         let frame = CGRect(x: xOffset, y: yOffset, width: width, height: height)
         
         return frame
-    }
-    
-    private func resetVisibleCardsTransparency() {
-        for index in 1..<visibleCards.count {
-            let card = visibleCards[index]
-            card.alpha = visualSettings.alphaValueSemiTransparent
-        }
     }
     
     private func createCard(#index: Int) -> KolodaCardView {
@@ -262,10 +254,6 @@ public class KolodaView: UIView, KolodaCardViewProtocol {
                 let card = visibleCards[index]
                 card.frame = frame
                 card.layoutIfNeeded()
-                
-                if 1 == index {
-                    card.alpha = visualSettings.alphaValueOpaque
-                }
                 
                 previousFrame = currentFrame
             }
@@ -347,7 +335,6 @@ public class KolodaView: UIView, KolodaCardViewProtocol {
             UIView.animateWithDuration(0.2, delay: 0.0, options: .CurveLinear, animations: {
                 self.moveOtherCardsWithFinishPercent(0)
             }, completion: { _ in
-                self.resetVisibleCardsTransparency()
                 self.animating = false
                 self.enabled = true
             })
@@ -412,10 +399,6 @@ public class KolodaView: UIView, KolodaCardViewProtocol {
                     self.enabled = true
                     self.delegate?.koloda(self, didSwipedCardAtIndex: self.currentCardNumber - 1, inDirection: direction)
                 }
-                card.alpha = visualSettings.alphaValueOpaque
-            }
-            else {
-                card.alpha = visualSettings.alphaValueSemiTransparent
             }
             
             card.userInteractionEnabled = isVisible(index: index)
@@ -467,7 +450,6 @@ public class KolodaView: UIView, KolodaCardViewProtocol {
     private func moveCardsInDeckAfterRevert() {
         for index in 1..<visibleCards.count {
             let card = visibleCards[index]
-            card.alpha = visualSettings.alphaValueSemiTransparent
             card.userInteractionEnabled = false
 
             let animation = createSimpleFrameAnimation(frameForCardAtIndex(index))
@@ -518,8 +500,6 @@ public class KolodaView: UIView, KolodaCardViewProtocol {
             for index in 1...cardsToAdd {
                 let nextCardIndex = countOfVisibleCards - cardsToAdd + index - 1
                 let nextCardView = KolodaCardView(frame: frameForCardAtIndex(index))
-                
-                nextCardView.alpha = visualSettings.alphaValueSemiTransparent
                 nextCardView.delegate = self
                 
                 visibleCards.append(nextCardView)
@@ -543,11 +523,6 @@ public class KolodaView: UIView, KolodaCardViewProtocol {
             animating = true
             
             cardOnTop.swipe(direction)
-            
-            if 1 < visibleCards.count {
-                let nextCard = visibleCards[1]
-                nextCard.alpha = visualSettings.alphaValueOpaque
-            }
         }
     }
     
@@ -567,10 +542,3 @@ public class KolodaView: UIView, KolodaCardViewProtocol {
         reloadData()
     }
 }
-
-
-
-
-
-
-

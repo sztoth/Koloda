@@ -44,7 +44,7 @@ public class KolodaCardView: KolodaBaseView {
 
     override public var frame: CGRect {
         didSet {
-            margin = floor(CGRectGetWidth(frame) / 2.0)
+            margin = floor(CGRectGetWidth(frame) / 3.0)
         }
     }
     
@@ -132,7 +132,7 @@ public class KolodaCardView: KolodaBaseView {
     
     private func setupCard() {
         identifier = "KolodaCardView"
-        layer.cornerRadius = 2.0
+        layer.cornerRadius = 4.0
         
         setDefaultValues()
         addGestures()
@@ -288,7 +288,7 @@ public class KolodaCardView: KolodaBaseView {
         overlayView?.direction = direction
         overlayView?.alpha = 1.0
         
-        UIView.animateWithDuration(0.3, delay: 0.0, options: .CurveEaseIn, animations: animationBlock, completion: { _ in
+        UIView.animateWithDuration(0.2, delay: 0.0, options: .CurveEaseIn, animations: animationBlock, completion: { _ in
             self.userInteractionEnabled = true
             self.acceptsAction = true
             

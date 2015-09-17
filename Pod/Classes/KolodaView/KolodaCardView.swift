@@ -54,7 +54,7 @@ public class KolodaCardView: KolodaBaseView {
         setupCard()
     }
     
-    required public init(coder aDecoder: NSCoder) {
+    required public init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         
         setupCard()
@@ -83,12 +83,12 @@ public class KolodaCardView: KolodaBaseView {
     internal func removeViews() -> (content: KolodaContentView?, overlay: KolodaOverlayView?) {
         let views = (contentView, overlayView)
         
-        if let unwrappedContent = contentView {
+        if let _ = contentView {
             contentView!.removeFromSuperview()
             contentView = nil
         }
         
-        if let unwrappedOverlay = overlayView {
+        if let _ = overlayView {
             overlayView!.removeFromSuperview()
             overlayView = nil
         }
@@ -108,7 +108,7 @@ public class KolodaCardView: KolodaBaseView {
     }
     
     private func addToCardView(view: UIView) {
-        view.setTranslatesAutoresizingMaskIntoConstraints(false)
+        view.translatesAutoresizingMaskIntoConstraints = false
         addSubview(view)
         NSLayoutConstraint.fit(parent: self, child: view)
     }
@@ -171,13 +171,13 @@ public class KolodaCardView: KolodaBaseView {
         
         switch recognizer.state {
         case .Began:
-            panBegan(location: location)
+            panBegan(location)
             break
         case .Changed:
-            panChanged(location: location)
+            panChanged(location)
             break
         case .Ended, .Failed, .Cancelled:
-            panEnded(location: location)
+            panEnded(location)
             break
         default:
             break
@@ -186,16 +186,18 @@ public class KolodaCardView: KolodaBaseView {
     
     // MARK: - Individual gesture states
     
-    private func panBegan(#location: CGPoint) {
+    private func panBegan(location: CGPoint) {
         acceptsAction = false
-        layer.shouldRasterize = true
         originalCenter = center
         rotationDirection = floor(CGRectGetHeight(frame) / 2.0) <= location.y ? .Left : .Right
+        
+        layer.shouldRasterize = true
+        pop_removeAllAnimations()
         
         delegate?.cardMovementStarted(self)
     }
     
-    private func panChanged(#location: CGPoint) {
+    private func panChanged(location: CGPoint) {
         let rotationStrength = min(distance.x / CGRectGetWidth(frame), rotationMax)
         let rotationAngle = CGFloat(rotationDirection.rawValue) * defaultRotationAngle * rotationStrength
         let scaleStrength = 1 - ((1 - scaleMin) * fabs(rotationStrength))
@@ -224,13 +226,13 @@ public class KolodaCardView: KolodaBaseView {
         delegate?.card(self, draggedWithPercent: percent, inDirection: direction)
     }
     
-    private func panEnded(#location: CGPoint) {
+    private func panEnded(location: CGPoint) {
         let direction = determineDirection()
         if .None == direction {
             animateToOriginalPlace()
         }
         else {
-            animateToSide(direction: direction)
+            animateToSide(inDirection: direction)
         }
     }
     
@@ -270,18 +272,18 @@ public class KolodaCardView: KolodaBaseView {
         })
     }
     
-    private func animateToSide(#direction: KolodaDirection) {
+    private func animateToSide(inDirection direction: KolodaDirection) {
         let screenWidth = CGRectGetWidth(UIScreen.mainScreen().bounds)
         let valueY = originalCenter.y + distance.y
         let valueX = direction == .Left ? -screenWidth : 2 * screenWidth
         let destination = CGPointMake(valueX, valueY)
                 
-        animate(direction: direction) { _ in
+        animate(inDirection: direction) { _ in
             self.center = destination
         }
     }
     
-    private func animate(#direction: KolodaDirection, animationBlock: (() -> Void)) {
+    private func animate(inDirection direction: KolodaDirection, animationBlock: (() -> Void)) {
         userInteractionEnabled = false
         acceptsAction = false
         
@@ -305,7 +307,7 @@ public class KolodaCardView: KolodaBaseView {
             let desination = CGPoint(x: CGRectGetWidth(UIScreen.mainScreen().bounds) * modifier, y: center.y)
             let transformation = CGAffineTransformMakeRotation(CGFloat(direction.rawValue) * CGFloat(M_PI_4))
             
-            animate(direction: direction, animationBlock: { _ in
+            animate(inDirection: direction, animationBlock: { _ in
                 self.center = desination
                 self.transform = transformation
             })
@@ -315,7 +317,7 @@ public class KolodaCardView: KolodaBaseView {
 
 private extension NSLayoutConstraint {
     
-    private class func fit(#parent: UIView, child: UIView) {
+    private class func fit(parent parent: UIView, child: UIView) {
         let top = NSLayoutConstraint(item: child, attribute: .Top, relatedBy: .Equal, toItem: parent, attribute: .Top, multiplier: 1.0, constant: 0.0)
         let leading = NSLayoutConstraint(item: child, attribute: .Leading, relatedBy: .Equal, toItem: parent, attribute: .Leading, multiplier: 1.0, constant: 0.0)
         let width = NSLayoutConstraint(item: child, attribute: .Width, relatedBy: .Equal, toItem: parent, attribute: .Width, multiplier: 1.0, constant: 0.0)

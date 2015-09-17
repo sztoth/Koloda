@@ -14,11 +14,11 @@ public class KolodaBaseView: UIView, KolodaReusableProtocol {
         super.init(frame: frame)
     }
     
-    required public init(coder aDecoder: NSCoder) {
+    required public init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
     }
     
-    private func setup(#identifier: String) {
+    private func setup(identifier identifier: String) {
         self.identifier = identifier
         backgroundColor = UIColor.clearColor()
         layer.cornerRadius = 4.0
@@ -43,7 +43,7 @@ public class KolodaContentView: KolodaBaseView {
         setup(identifier: "KolodaContentView")
     }
     
-    required public init(coder aDecoder: NSCoder) {
+    required public init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         
         setup(identifier: "KolodaContentView")
@@ -78,7 +78,7 @@ public class KolodaOverlayView: KolodaBaseView {
         setup(identifier: "KolodaOverlayView")
     }
     
-    required public init(coder aDecoder: NSCoder) {
+    required public init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         
         setup(identifier: "KolodaOverlayView")

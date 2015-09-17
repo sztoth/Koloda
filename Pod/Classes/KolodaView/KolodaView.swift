@@ -38,7 +38,7 @@ public class KolodaView: UIView, KolodaCardViewProtocol {
     
     public weak var dataSource: KolodaDataSource? {
         didSet {
-            if let unwrappedDataSource = dataSource {
+            if let _ = dataSource {
                 setupCards()
             }
         }
@@ -74,7 +74,7 @@ public class KolodaView: UIView, KolodaCardViewProtocol {
         setup()
     }
     
-    required public init(coder aDecoder: NSCoder) {
+    required public init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         
         setup()
@@ -98,7 +98,7 @@ public class KolodaView: UIView, KolodaCardViewProtocol {
     
     // MARK: - Recycling views
     
-    public func dequeueReusableView<T: KolodaBaseView>(#identifier: String) -> T {
+    public func dequeueReusableView<T: KolodaBaseView>(identifier identifier: String) -> T {
         let view: T? = recycler.dequeue(identifier: identifier)
         if let validView = view {
             validView.prepareForReuse()
@@ -110,18 +110,18 @@ public class KolodaView: UIView, KolodaCardViewProtocol {
         return view!
     }
     
-    public func register(#nib: UINib, forObjectReuseIdentifier identifier: String) {
+    public func register(nib nib: UINib, forObjectReuseIdentifier identifier: String) {
         recycler.register(nib: nib, forObjectReuseIdentifier: identifier)
     }
     
-    public func register(#objectClass: KolodaBaseView.Type, forObjectReuseIdentifier identifier: String) {
-        recycler.register(objectClass: objectClass, forObjectReuseIdentifier: identifier)
+    public func register(Class objectClass: KolodaBaseView.Type, forObjectReuseIdentifier identifier: String) {
+        recycler.register(Class: objectClass, forObjectReuseIdentifier: identifier)
     }
     
     // MARK: - Private
     
     private func setup() {
-        recycler.register(objectClass: KolodaCardView.self, forObjectReuseIdentifier: KolodaView.KolodaCardViewKey)
+        recycler.register(Class: KolodaCardView.self, forObjectReuseIdentifier: KolodaView.KolodaCardViewKey)
     }
     
     private func setupCards() {
@@ -146,12 +146,12 @@ public class KolodaView: UIView, KolodaCardViewProtocol {
         }
     }
     
-    private func isVisible(#index: Int) -> Bool {
+    private func isVisible(index index: Int) -> Bool {
         return 0 == index
     }
     
     private func layoutCards() {
-        for (index, card) in enumerate(self.visibleCards) {
+        for (index, card) in self.visibleCards.enumerate() {
             card.frame = frameForCardAtIndex(index)
         }
     }
@@ -180,7 +180,7 @@ public class KolodaView: UIView, KolodaCardViewProtocol {
         return frame
     }
     
-    private func createCard(#index: Int) -> KolodaCardView {
+    private func createCard(index index: Int) -> KolodaCardView {
         let contentView = contentViewForIndex(index)
         let overlayView = overlayViewForIndex(index)
         
@@ -200,7 +200,7 @@ public class KolodaView: UIView, KolodaCardViewProtocol {
         return animation
     }
     
-    private func recycle(#card: KolodaCardView) {
+    private func recycle(card card: KolodaCardView) {
         let views = card.removeViews()
         recycler.enqueue(object: card)
         
@@ -252,6 +252,8 @@ public class KolodaView: UIView, KolodaCardViewProtocol {
                 
                 let frame = calculateFrame(current: currentFrame, previous: previousFrame!, percent: percent)
                 let card = visibleCards[index]
+                
+                card.pop_removeAllAnimations()
                 card.frame = frame
                 card.layoutIfNeeded()
                 
@@ -260,7 +262,7 @@ public class KolodaView: UIView, KolodaCardViewProtocol {
         }
     }
     
-    private func calculateFrame(#current: CGRect, previous: CGRect, percent: CGFloat) -> CGRect {
+    private func calculateFrame(current current: CGRect, previous: CGRect, percent: CGFloat) -> CGRect {
         let movementY = (CGRectGetMinY(current) - CGRectGetMinY(previous)) * (percent / 100)
         let valueY = CGRectGetMinY(current) - movementY
         
@@ -318,7 +320,7 @@ public class KolodaView: UIView, KolodaCardViewProtocol {
     // MARK: - Draggable delegate
     
     func cardTapped(card: KolodaCardView) {
-        if let foundIndex = find(visibleCards, card) {
+        if let foundIndex = visibleCards.indexOf(card) {
             let index = currentCardNumber + foundIndex
             delegate?.koloda(self, didSelectCardAtIndex: index)
         }
@@ -389,7 +391,7 @@ public class KolodaView: UIView, KolodaCardViewProtocol {
     }
     
     private func moveCardsInDeckAfterSwipe(direction: KolodaDirection) {
-        for (index, card) in enumerate(visibleCards) {
+        for (index, card) in visibleCards.enumerate() {
             let animation = createSimpleFrameAnimation(frameForCardAtIndex(index))
 
             if 0 == index {
@@ -484,13 +486,7 @@ public class KolodaView: UIView, KolodaCardViewProtocol {
             }
         }
         else {
-            for index in 0..<visibleCards.count {
-                let contentView = contentViewForIndex(currentCardNumber + index)
-                let overlayView = overlayViewForIndex(currentCardNumber + index)
-                
-                let card = visibleCards[index]
-                card.configure(contentView, overlay: overlayView)
-            }
+            reconfigureCards()
         }
     }
     
@@ -507,6 +503,10 @@ public class KolodaView: UIView, KolodaCardViewProtocol {
             }
         }
         
+        reconfigureCards()
+    }
+    
+    private func reconfigureCards() {
         for index in 0..<visibleCards.count {
             let contentView = contentViewForIndex(currentCardNumber + index)
             let overlayView = overlayViewForIndex(currentCardNumber + index)

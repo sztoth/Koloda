@@ -494,7 +494,6 @@ public class KolodaView: UIView, KolodaCardViewProtocol {
         if 0 < missingCardsCount {
             let cardsToAdd = min(missingCardsCount, totalCards - currentCardNumber)
             for index in 1...cardsToAdd {
-                let nextCardIndex = countOfVisibleCards - cardsToAdd + index - 1
                 let nextCardView = KolodaCardView(frame: frameForCardAtIndex(index))
                 nextCardView.delegate = self
                 
